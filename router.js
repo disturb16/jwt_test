@@ -3,6 +3,10 @@ const jwt = require('jsonwebtoken')
 const fs = require('fs')
 const router = express.Router()
 
+router.get('/', (req, res)=>{
+  res.send('Hello')
+})
+
 router.post('/user/login', (req, res)=>{
   const email = req.body.email
   const password = req.body.password
