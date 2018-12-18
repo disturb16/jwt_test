@@ -17,6 +17,8 @@ router.post('/user/login', (req, res)=>{
       error: "Parameters username or password not provided"
     })
   }
+  
+  const t = req.originalUrl
 
   if (email !== 't@t.com' || password !== '1234'){
     return res.status(200).json({
@@ -29,7 +31,8 @@ router.post('/user/login', (req, res)=>{
 
   const jwtOptions = {
     expiresIn: "30m",
-    algorithm: "RS256"
+    algorithm: "RS256",
+    issuer: "auth"
   }
 
   const token = jwt.sign({
