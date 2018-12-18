@@ -7,46 +7,6 @@ router.get('/', (req, res)=>{
   res.send('Hello')
 })
 
-router.post('/user/login', (req, res)=>{
-  const email = req.body.email
-  const password = req.body.password
-
-  if(!email || !password){
-    return res.status(400).json({
-      success: false,
-      error: "Parameters username or password not provided"
-    })
-  }
-  
-  const t = req.originalUrl
-
-  if (email !== 't@t.com' || password !== '1234'){
-    return res.status(200).json({
-      success: false,
-      msg: 'Incorrect username or password'
-    })
-  }
-
-  const cert = fs.readFileSync('./private.pem')
-
-  const jwtOptions = {
-    expiresIn: "30m",
-    algorithm: "RS256",
-    issuer: "auth"
-  }
-
-  const token = jwt.sign({
-      id: 0001,
-      email
-    },
-    cert,
-    jwtOptions
-  )
-
-  return res.status(200).json({success: true, token})
-
-})
-
 router.get('/test', (req, res)=>{
   return res.status(200).json({result: "is working"})
 })
