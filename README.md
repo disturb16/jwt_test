@@ -49,12 +49,13 @@ If *Dockerfile* and *docker-compose* require modification, please refer to SRE d
 To make any interaction with the database the process should be handle by the services package. We'll create a new file `internal > services > users_service.go`:
 
 This is a function that returns the list of users, note that it has access to the Service pointer and uses the User struct in models package.
-
-`func (s *Service) GetUsers(ctx context.Context) ([]models.User, error)`
+```go
+func (s *Service) GetUsers(ctx context.Context) ([]models.User, error)
+```
 
 to get a better control over queries failure we get the connection Id from the connection pool and also the connection.
 
-```
+```go
 conn, connID, err := s.getConnFromPool(ctx)
 	if err != nil {
 		return nil, err
@@ -65,7 +66,7 @@ defer conn.Close()
 
 Then you can query the server and if an error occurs we can also kill the running query. 
 
-```
+```go
 rows, err := conn.QueryContext(ctx, qrystring)
 	if err != nil {
 		s.killQuery(connID, err)
@@ -78,7 +79,8 @@ defer rows.Close()
 *Note: this is required mostly for mysql databases, other like postgreSQL might not need it because it is handled by the sql package*.
 
 After that we can process the data as needed and return the array of users.
-```
+
+```go
 users := []models.User{}
 
 for rows.Next() {
@@ -99,11 +101,13 @@ The purpose of any handler is to process the incoming requests to the server, we
 
 This function will return a specific user located in `internal > handlers > users_handler.go` and has access to the handler pointer.
 
-`func (h *handler) login(w http.ResponseWriter, req *http.Request)`
+```go
+func (h *handler) login(w http.ResponseWriter, req *http.Request)
+```
 
 To decode the incoming data we will create a struct.
 
-```
+```go
 type userInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -112,7 +116,7 @@ type userInput struct {
 
 Now we can get the data from the request.
 
-```
+```go
 uinput := &userInput{}
 
 // use the function to decode the request available in the handler_utils
@@ -130,12 +134,12 @@ if err != nil {
 
 Now we can call the service method to validate the login, if everything is correct we return the user data to the client.
 
-```
+```go
 ctx := req.Context()
 user, err := h.Service.loginUser(ctx, uinput.Email, uinput.Password)
 
 if err != nil{
-  ...
+  //...
 }
 
 jsonResponse(w, user)
@@ -145,7 +149,7 @@ jsonResponse(w, user)
 
 After this we just need to enable this endpoint in `internal > handlers > routes.go`.
 
-```
+```go
 // Router returns api router
 func (h *handler) Router() *mux.Router {
   
